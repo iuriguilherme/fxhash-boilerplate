@@ -24,25 +24,26 @@ import p5 from 'p5';
 
 const unique = fxhash
 const super = getFeatureSuper(fxrand())
-
-window.$fxhashFeatures = {
-  "super": super
-}
+let size;
 
 let sketch = function(p5) {
   p5.setup = function() {
-    p5.createCanvas(p5.windowWidth, p5.windowHeight);
-    p5.background(255);
-    p5.frameRate(30);
+    p5.randomSeed(fxrand() * 1e8);
+    size = p5.min(window.innerWidth, window.innerHeight);
+    p5.createCanvas(size, size);
+    p5.colorMode(p5.HSL)
+    p5.noLoop();
   };
   p5.draw = function() {
     p5.background(255);
     document.write("fxhash: " + unique)
     document.write("super: " + super)
     document.write("random: " + fxhash())
+    await new Promise(r => setTimeout(r, 1));
   };
   p5.windowResized = function() {
-    p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+    size = p5.min(window.innerWidth, window.innerHeight);
+    p5.resizeCanvas(size, size);
   }
 }
 let myp5 = new p5(sketch, window.document.body);
@@ -69,4 +70,8 @@ function getFeatureSuper(value) {
   } else {
     return 1.0;
   }
+}
+
+window.$fxhashFeatures = {
+  "super": super
 }

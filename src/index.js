@@ -1,9 +1,12 @@
 /**!
- * @file fxhash-boilerplate-webpack-libre  
- * @version 0.0.0.0  
+ * @file fxhash boilerplate webpack  
+ * @version 1.1.0.0  
  * @copyright Iuri Guilherme 2023  
  * @license GNU AGPLv3  
  * @author Iuri Guilherme <https://iuri.neocities.org/>  
+ * @author Laurent Houdard <https://github.com/laurent-h>  
+ * @author ciphrd <https://github.com/ciphrd>  
+ * @author fxhash <https://github.com/fxhash>  
  * 
  * This program is free software: you can redistribute it and/or modify it 
  * under the terms of the GNU Affero General Public License as published by the 
@@ -21,57 +24,96 @@
  */
 
 import p5 from 'p5';
+import { create, all } from 'mathjs';
+const math = create(all, {})
 
-const unique = fxhash
-const super = getFeatureSuper(fxrand())
-let size;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// https://github.com/fxhash/fxhash-webpack-boilerplate/issues/20
+const properAlphabet = 
+    "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+const variantFactor = 3.904e-87; // This number is magic
+const fxhashDecimal = base58toDecimal(fxhashTrunc);
+const featureVariant = fxHashToVariant(fxhashDecimal, 1);
+//~ const featureVariant = -1;
+let size, scale, ratio, reWidth, reHeight;
+let width = window.innerWidth;
+let height = window.innerHeight;
 
 let sketch = function(p5) {
   p5.setup = function() {
     p5.randomSeed(fxrand() * 1e8);
-    size = p5.min(window.innerWidth, window.innerHeight);
+    p5.colorMode(p5.HSL);
+    ratio = width / height;
+    checkRatio();
+    size = p5.min(reWidth, reHeight);
     p5.createCanvas(size, size);
-    p5.colorMode(p5.HSL)
+    scale = width / reWidth;
+    p5.scale(scale);
+    p5.frameRate(60);
     p5.noLoop();
   };
   p5.draw = function() {
     p5.background(255);
-    document.write("fxhash: " + unique)
-    document.write("super: " + super)
-    document.write("random: " + fxhash())
-    await new Promise(r => setTimeout(r, 1));
+    console.log({
+      "fxhash": fxhashTrunc,
+      "fxhashDecimal": fxhashDecimal,
+      "featureVariant": featureVariant
+    )
+    await sleep(1);
+    fxpreview();
   };
   p5.windowResized = function() {
-    size = p5.min(window.innerWidth, window.innerHeight);
+    checkRatio();
+    size = p5.min(reWidth, reHeight);
     p5.resizeCanvas(size, size);
   }
 }
 let myp5 = new p5(sketch, window.document.body);
 
-function getFeatureSuper(value) {
-  if (value < 0.1) {
-    return 0.1;
-  } else if (value < 0.2) {
-    return 0.2;
-  } else if (value < 0.3) {
-    return 0.3;
-  } else if (value < 0.4) {
-    return 0.4;
-  } else if (value < 0.5) {
-    return 0.5;
-  } else if (value < 0.6) {
-    return 0.6;
-  } else if (value < 0.7) {
-    return 0.7;
-  } else if (value < 0.8) {
-    return 0.8;
-  } else if (value < 0.9) {
-    return 0.9;
-  } else {
-    return 1.0;
-  }
+function checkRatio() {
+    let reRatio = window.innerWidth / window.innerHeight;
+    if (reRatio > ratio) {
+        scale = window.innerHeight / height;
+        reWidth = (window.innerHeight / height) * width;
+        reHeight = window.innerHeigth;
+    } else {
+        scale = window.innerWidth / width;
+        reWidth = window.innerWidth;
+        reHeight = (window.innerWidth / width) * height;
+    }
+}
+
+/**
+ * @param {String} hash: unique fxhash string (or xtz transaction hash)
+ * @returns {float} decimal representation of the number in base58 
+ */
+function base58toDecimal(hash = fxhashTrunc) {
+    let decimal = 0;
+    let iterArray = Array.from(hash).reverse();
+    while (iterArray.length > 0) {
+        decimal += properAlphabet.indexOf(iterArray.slice(-1)) * (math.pow(58,
+            iterArray.length - 1));
+        iterArray = iterArray.slice(0, -1);
+    }
+    return decimal;
+}
+
+/**
+ * @param {float} decimalHash: output from base58toDecimal(fxhash)
+ * @param {int} maxVariants: the inclusive n from the desired range 
+ *      of (0, n) for the return value
+ * @param {boolean} inverse: transforms range into (n, 0)
+ * @returns {int} one random integer defined by fxhash and a threshold
+ *      defined by maxVariants * variantFactor
+ */
+function fxHashToVariant(decimalHash, maxVariants = 0, inverse = false) {
+    let variant = math.round(decimalHash * maxVariants * variantFactor);
+    if (inverse) {
+        return math.abs(maxVariants - variant);
+    }
+    return variant;
 }
 
 window.$fxhashFeatures = {
-  "super": super
+  "fx(variant)": featureVariant
 }

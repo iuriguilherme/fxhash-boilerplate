@@ -5,11 +5,11 @@ What has changed
 ---
 
 This particular fork is for personal use, as a template for my tokens published 
-on [fx(hash)](https://fxhash.xyz).  
+on [fx(hash)](https://www.fxhash.xyz/u/Iuri%20Guilherme).  
 
 This particular fork uses GNU Affero as license, as it's tokens.  
 
-This particular fork includes p5js.  
+This particular fork includes p5js and mathjs.  
 
 Original README:  
 
@@ -163,7 +163,9 @@ job in that regard.
 LICENSE
 ---
 
-Copyright 2023 Iuri Guilherme <https://iuri.neocities.org/>
+Copyright 2023 
+[fxhash](https://github.com/fxhash/fxhash-webpack-boilerplate/graphs/contributors), 
+[Iuri Guilherme](https://iuri.neocities.org/)  
 
 This program is free software: you can redistribute it and/or modify it under 
 the terms of the GNU Affero General Public License as published by the Free 

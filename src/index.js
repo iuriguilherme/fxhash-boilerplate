@@ -1,6 +1,6 @@
 /**!
  * @file fxhash boilerplate webpack  
- * @version 1.1.1.0  
+ * @version 1.1.1.1  
  * @copyright Iuri Guilherme 2023  
  * @license GNU AGPLv3  
  * @author Iuri Guilherme <https://iuri.neocities.org/>  
@@ -52,13 +52,13 @@ let sketch = function(p5) {
     p5.frameRate(60);
     p5.noLoop();
   };
-  p5.draw = function() {
+  p5.draw = async function() {
     p5.background(255);
     console.log({
       "fxhash": fxhashTrunc,
       "fxhashDecimal": fxhashDecimal,
       "featureVariant": featureVariant
-    )
+    })
     await sleep(1);
     fxpreview();
   };

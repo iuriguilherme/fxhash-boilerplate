@@ -1,6 +1,6 @@
 /**!
  * @file fxhash boilerplate webpack  
- * @version 1.1.0.0  
+ * @version 1.1.1.0  
  * @copyright Iuri Guilherme 2023  
  * @license GNU AGPLv3  
  * @author Iuri Guilherme <https://iuri.neocities.org/>  
